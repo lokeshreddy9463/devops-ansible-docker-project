@@ -1,0 +1,28 @@
+---
+- hosts : all
+  tasks : 
+  - name : Copyuing docker file remote server
+    become : true
+    copy :
+     src : Dockerfile
+     dest : .
+
+  - name : Copyuing webapp.war file to remote server
+    become : true
+    copy :
+     src : webapp.war
+     dest : .
+     
+  - name : Stop the running container
+    command: docker rm -f cstmcntr
+    ignore_errors: true
+
+  - name: Delete the image
+    command: docker rmi cstmimg
+    ignore_errors: true
+
+  - name: Create an image from docker file
+    command:  docker build -t cstmimg .
+
+  - name: Docker run container
+    command: docker run -d -p 8090:8080 --name cstmcntr cstmimg
